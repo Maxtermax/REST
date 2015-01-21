@@ -15,10 +15,14 @@ bower install
 
 ### Start mongodb
 
+```
 mongod
+```
 
 ### Run app
+```
 node app.js
+```
 
 ### TODO
  File handdler, frontend desig with bootstrap 
