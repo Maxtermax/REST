@@ -1,0 +1,11 @@
+<div ng-controller="LoginCtrl">
+	<form name='loginForm' ng-submit=getIn({name:Uname,pass:Upass}) novalidate >
+		<label>nombre de usuario</label>
+		<input type='text' placeholder="usuario" ng-model='Uname'>	
+		<label>contraseña</label>
+		<input type='password' placeholder='contraseña' ng-model='Upass'>	
+		<input type='submit'>	
+		<a href="#/account">Registrate</a>
+	</form>
+
+</div>

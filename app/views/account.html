@@ -1,0 +1,38 @@
+<div>
+	<form name='AccountForm' ng-submit='Register({name:Uname,pass:Upass,email:Umail})' novalidate ng-controller="AccountCtrl as account">
+
+		<div> 
+			<label>nombre de usuario</label>
+			<small>Ayuda</small>
+		 	{{AccountForm.name.$invalid && 'Escribe un nombre de usuario con minimo 5 caracteres y maximo 10' || 'Nombre de usuario correcto' }}
+			<input type='text' placeholder="usuario"  required ng-model='Uname'  name='name' >	
+		</div> 
+
+		<div>
+			<label>contraseña</label>
+			<small>Ayuda</small>
+		 	{{AccountForm.pass.$invalid && 'Escribe una contraseña con minimo 5 caracteres y maximo 10 sin signos y espacios ' || 'Contraseña correcta' }}
+			<input type='password' placeholder='contraseña' required ng-model='Upass' name='pass' >
+		</div>
+
+		<div>
+			<label>Repite la contraseña</label>
+			<small>Ayuda</small>
+		 	{{AccountForm.Rpass.$invalid && 'Repite la misma contraseña que pusiste en el campo anterior ' || 'Ok!' }}
+			<input type='password' placeholder='contraseña' required ng-model='RUpass' name='Rpass' >
+		</div>
+		<div>
+			<label>Correo electronico</label>
+			<small>Ayuda</small>
+			{{AccountForm.mail.$invalid && 'Escribe un correo electronico ...............' || 'Correo electronico correcto' }}
+			<input type='email' placeholder='example@gmail.com' required ng-model='Umail' name='mail' >
+		</div>
+
+		<input type='submit' value='registrate'>	
+		<a href="#/login">Ya tengo una cuanta creada</a>
+
+		
+
+	</form>
+
+</div>
