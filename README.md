@@ -1,4 +1,4 @@
-# MEAD
+# MEAN
 Simple mean stack testing repository.
 
 ### Features
