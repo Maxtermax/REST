@@ -1,10 +1,9 @@
 'use strict';
 
 var auth = function ($http) {
-
 	return {
-		verifyToken : function(token) {
-			return $http({url: '/', method: 'POST',headers:{Authorization:"Bearer "+token} });
+		verifyToken : function(data) {
+		  return $http({url:data.url, method: data.method,headers:{Authorization:"Bearer "+data.key} })
 		},
 		login : function(info) {
 			return $http({url:'/login',method:'POST',data:info});

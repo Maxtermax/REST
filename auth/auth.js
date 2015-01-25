@@ -4,19 +4,27 @@ var auth = function(key,jwt) {
 		return token;
 	};// genToken
 
-	var verifyToken = function(token){
-		jwt.verify(token,key,function(err,decode) {
-			if(err && err.name ) {
-				return {err:err.name};
-			}else{
-				return true;
-			}
-		})
-	};
+
+	var verifyToken = function(err,req,res,next) {
+		var path = req.path;
+		if(err){
+			if(req.method === 'GET' && path === "/") {
+				next();
+				console.log('NO TOKEN SOLO QUIERO LA VISTA NORMAL');
+			}else {
+				res.status(err.status).send(err);
+				console.log('no autorizado ');
+			};
+		}else{
+			console.log('SIGASE');
+			next();
+		}
+	}
+
 
 	return {
-		'genToken'    : genToken,
-		'verifyToken' : verifyToken
+		'genToken'   : genToken,
+		'verifyToken': verifyToken 
 	}
 }
 	

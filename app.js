@@ -1,14 +1,14 @@
-var express 		= require('express')//express 4
+var express 		= require("express")//express 4
 ,		app 				= express()
-,		server 			= require('http').createServer(app)
-,		io 					= require('socket.io')(server)//socket las version
-,		fs 					= require('fs')
-,		bodyParser 	= require('body-parser')
-,		cors 				= require('cors')
+,		server 			= require("http").createServer(app)
+,		io 					= require("socket.io")(server)//socket last version
+,		fs 					= require("fs")
+,		bodyParser 	= require("body-parser")
+,		cors 				= require("cors")
 ,		session			= require("express-jwt")
-,		model 			= require('./model/model.js')
-,		jwt 				= require('jsonwebtoken');
-
+,		model 			= require("./model/model.js")
+,		jwt 				= require("jsonwebtoken")
+,		_           = require("underscore"); 
 
 app.set('view engine', 'html');
 app.set('views', __dirname + '/app/views');
@@ -34,26 +34,8 @@ app.use(session({
 	secret:key,
 	exp:5
 }).unless({path: ['/login']}));
+app.use(auth.verifyToken);
 
-app.use(function(err,req,res,next) {
-	var path = req.path;
-	var b    = req.body;
-	if(path != '/login' && path != '/account' && path != '/') {
-		res.send(404);
-		console.log('NO <ENCONTRADO></ENCONTRADO> ');
-	} else if(err){
-		if(req.method === 'GET') {
-			next();
-			console.log('NO TOKEN SOLO QUIERO LA VISTA NORMAL');
-		}else {
-			res.status(err.status).send(err);
-			console.log('no autorizado ');
-		};
-	}else{
-		console.log('SIGASE');
-		next();
-	}
-});
 
 app.get('/',function(req,res) {
 	res.sendFile(__dirname+'/app/views/index.html');
@@ -61,7 +43,7 @@ app.get('/',function(req,res) {
 
 
 app.route('/')
-	.post(routes.home);
+ .post(routes.news);
 
 app.route('/account')
  .post(routes.account);
@@ -69,17 +51,8 @@ app.route('/account')
 app.route('/login')
 	.post(routes.login);
 
-
-/*
-
-//	var token = jwt.sign({secret:'esneyder'},'lolipop');
-	var token = req.headers.authorization.split(' ')[1];
-	var decode = jwt.verify(token,key);
-	console.log(decode,'decode');
-	res.send(decode);
-*/
-
-
+app.route('/u/:name')
+	.get(routes.profile);
 
 
 

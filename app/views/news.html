@@ -1,17 +1,38 @@
-<p>COPY HEAD</p>
-<div ng-show='user'>
-	<h1> Bienvenido {{ user.name }}		</h1>
-	<h2> te quedan :{{ hora | date:'medium'  }} </h2>
-	<button ng-click="logout()">Cerrar session</button>
-</div>
-
-<div ng-hide='user'>
-	<a ng-href="#/login">Inicia session</a>
-	<a ng-href="#/account">Registrase</a>
-</div>
+<li ng-repeat="user in users">
+ <a href="#/u/{{user.name}}">{{user.name}}</a>	
+</li>
 
 
-<p>COPY FOOTER</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

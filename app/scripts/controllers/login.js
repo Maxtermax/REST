@@ -7,7 +7,6 @@ var LoginCtrl = function ($scope,auth,$location,$window) {
 				var token = data.token;
 				if(token) {
 					console.log(data,'data');
-					$window.localStorage.user = data.user;
 					$window.sessionStorage.token = token;		
 				  $location.path("/");			  
 				};

@@ -1,8 +1,8 @@
 var configRoutes = function($routeProvider) {
 	$routeProvider
 		.when('/', {
-		  templateUrl   : 'views/news.html',
-		  controller    : 'NewsCtrl',
+		  templateUrl   : 'views/home.html',
+		  controller    : 'HomeCtrl',
 		  requiresLogin : true
 		})
 		.when('/login', {
@@ -15,19 +15,23 @@ var configRoutes = function($routeProvider) {
 		  controller    : 'AccountCtrl',
 		  requiresLogin : false
 		})
-		.otherwise({	
-			redirectTo: '/'
-		});
+		.when('/u/:name', {
+		  templateUrl: 'views/profile.html',
+		  controller: 'ProfileCtrl'
+		})
+		.otherwise({
+      redirectTo: '/'
+    });
 
 };//Routes config
 
-
-var run = function($rootScope,$location,$window,auth) {
+var run = function($rootScope,$location,$window,$route) {
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
 		var token = $window.sessionStorage.token;
-		if(!next.requiresLogin && token ) $location.path('/');
-		
+		var path = $location.$$path; 
+		if(path === "/account" || path === "/login" && token) $location.path('/');
 
+		//if( next.requiresLogin &&!next.requiresLogin && token ) $location.path('/');	
 	});
 };
 
