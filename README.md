@@ -25,7 +25,7 @@ node app.js
 ```
 
 ### TODO
- File handdler, frontend desig with bootstrap 
+ File handdler, frontend desig with bootstrap,Make a better API to make http request in the frontend
 
 
 
