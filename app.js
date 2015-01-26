@@ -5,9 +5,10 @@ var express 		= require("express")//express 4
 ,		fs 					= require("fs")
 ,		bodyParser 	= require("body-parser")
 ,		cors 				= require("cors")
-,		session			= require("express-jwt")
-,		model 			= require("./model/model.js")
+,		key  				= fs.readFileSync("secret/key.txt")
 ,		jwt 				= require("jsonwebtoken")
+,		session			= require("express-jwt")
+,		model 			= require("./model/model.js")(key,jwt)
 ,		_           = require("underscore"); 
 
 app.set('view engine', 'html');
@@ -25,15 +26,13 @@ app.use(express.static(__dirname+"/"));
 app.use(express.static(__dirname+"/app"));
 
 
-var key    = fs.readFileSync("secret/key.txt");
 var auth   = require("./auth/auth.js")(key,jwt);
 var routes = require('./routes/routes.js')(key,auth,model);
-
 
 app.use(session({
 	secret:key,
 	exp:5
-}).unless({path: ['/login']}));
+}).unless({path: ['/login','/account']}));
 app.use(auth.verifyToken);
 
 

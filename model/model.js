@@ -33,5 +33,25 @@ var Esquema = new Schema({
 	}]
 });
 
+module.exports = function(key,jwt) {
+	Esquema.methods.getProfile = function(query,token,cb) {
+  	var self = this;
+  	try{
+	  	var decode = jwt.verify(token,key);	
+	  	self.model('user').findOne(query,function(error,docs) {
+		 		if(docs && String(docs["_id"]) === decode["ID"] ) 
+		 			return cb(null,docs);
+		 		else if(error)
+		 			return cb(error,null);
+		 		else 
+		 			return cb(null,{name:docs.name,email:docs.email});				 		
+		 	});//end find 
+   	}catch(err){
+	 		return cb(err,null)
+  	}	
+	}//end getProfile
 
-module.exports = mongoose.model('user',Esquema);
+	return	mongoose.model('user',Esquema);
+};
+
+

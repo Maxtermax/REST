@@ -1,9 +1,11 @@
+var bcrypt = require('bcrypt');
+
 var auth = function(key,jwt) {	
+
 	var genToken = function(user) {
-		var token = jwt.sign({name :user.name,id: user['_id']},key,{expiresInMinutes:5})
+		var token = jwt.sign({name:user.name,"ID":user['ID']},key,{expiresInMinutes:5})
 		return token;
 	};// genToken
-
 
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
@@ -24,7 +26,7 @@ var auth = function(key,jwt) {
 
 	return {
 		'genToken'   : genToken,
-		'verifyToken': verifyToken 
+		'verifyToken': verifyToken
 	}
 }
 	

@@ -2,18 +2,15 @@ var configRoutes = function($routeProvider) {
 	$routeProvider
 		.when('/', {
 		  templateUrl   : 'views/home.html',
-		  controller    : 'HomeCtrl',
-		  requiresLogin : true
+		  controller    : 'HomeCtrl'
 		})
 		.when('/login', {
 		  templateUrl   : 'views/login.html',
-		  controller    : 'LoginCtrl',
-		  requiresLogin : false
+		  controller    : 'LoginCtrl'
 		})
 		.when('/account', {
 		  templateUrl   : 'views/account.html',
-		  controller    : 'AccountCtrl',
-		  requiresLogin : false
+		  controller    : 'AccountCtrl'
 		})
 		.when('/u/:name', {
 		  templateUrl: 'views/profile.html',
@@ -29,9 +26,6 @@ var run = function($rootScope,$location,$window,$route) {
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
 		var token = $window.sessionStorage.token;
 		var path = $location.$$path; 
-		if(path === "/account" || path === "/login" && token) $location.path('/');
-
-		//if( next.requiresLogin &&!next.requiresLogin && token ) $location.path('/');	
 	});
 };
 
