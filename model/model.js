@@ -1,14 +1,15 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var bcrypt = require('bcrypt');
+var _      = require('underscore');
 
-mongoose.connect('mongodb://localhost/Coder',function(err,res){
+mongoose.connect('mongodb://localhost/MEAN',function(err,res){
 	if(err) console.log(err);
-	else 		console.log("Conect at: Coder");
+	else 		console.log("Conect at: MEAN");
 });
 
-
-var Esquema = new Schema({
-	name:String,
+var schema = new Schema({
+	name:{type:String,unique:true},
 	pass:{type:String,unique:true},
 	pic:String,
 	email:String,
@@ -33,8 +34,24 @@ var Esquema = new Schema({
 	}]
 });
 
+var encryptPass = function(next) {
+	var self = this;
+	bcrypt.genSalt(10, function(err, salt) {
+    if (err) return next(err);
+    bcrypt.hash(self.pass,salt, function(err, hash) {
+      if (err) return next(err);
+      // override the textplain password with the hashed one
+      self.pass = hash;
+      next();
+    });
+  });
+}
+
+schema.pre("save",encryptPass);
+
 module.exports = function(key,jwt) {
-	Esquema.methods.getProfile = function(query,token,cb) {
+
+	schema.methods.getProfile = function(query,token,cb) {
   	var self = this;
   	try{
 	  	var decode = jwt.verify(token,key);	
@@ -51,7 +68,9 @@ module.exports = function(key,jwt) {
   	}	
 	}//end getProfile
 
-	return	mongoose.model('user',Esquema);
+	return mongoose.model('user',schema);
+
 };
+
 
 

@@ -1,21 +1,17 @@
-var controller = function ($scope,resourcesProvider,$location,$window) {
-	var response = function(res,header) {
-		if(res.err) {
-			$scope.badPass = true;
-			$scope.RUpass = '';
-			$scope.Upass = '';
-		}else if(res.token){
-			console.log(res,'res.token');
-			$window.sessionStorage.token = res.token;
-			$location.path("/");
-		};
-	};
-
-	$scope.Register = function(info) {
-		resourcesProvider
-			.register('/account',info)
-			.$save(response)//POST request
-	}
+var controller = function ($scope,singUp,$location,$window) {
+	$scope.submitData = function(info) {
+		console.log('fewfew');
+		singUp.register('/account',info)
+			.success(function(data,status,header,config) {
+				console.log(data,status);
+				$location.path("/login");
+			})
+			.error(function(err,status) {
+				console.log(err,status);
+				$scope.Uname = "";
+				$scope.Upass = "";
+			})
+	};//submitData
 
 };
 

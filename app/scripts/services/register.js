@@ -1,12 +1,15 @@
-var resourcesProvider = function($resource) {
+var singUp = function($http) {
 	return {
 		register:function(url,data){
-			var request =  $resource(url)
-			var user = new request();
-			user.name  = data.name;
-			user.pass  = data.pass;
-			user.email = data.email;
-			return user;
+			return $http({
+				'url':url,
+				method:'POST',
+				data:{
+					name:data.name,
+					pass:data.pass,
+					email:data.email
+				}
+			});
 		}//end register fn			
 	}
 
@@ -15,4 +18,4 @@ var resourcesProvider = function($resource) {
 
 
 angular.module('chatApp')
-.service('resourcesProvider',resourcesProvider);
+	.service('singUp',singUp);

@@ -1,5 +1,3 @@
-var bcrypt = require('bcrypt');
-
 var auth = function(key,jwt) {	
 
 	var genToken = function(user) {
