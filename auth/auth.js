@@ -8,7 +8,7 @@ var auth = function(key,jwt) {
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
 		if(err){
-			if(req.method === 'GET' && path === "/") {
+			if(req.method === 'GET') {
 				next();
 				console.log('NO TOKEN SOLO QUIERO LA VISTA NORMAL');
 			}else {

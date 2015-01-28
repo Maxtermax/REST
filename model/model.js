@@ -45,9 +45,21 @@ var encryptPass = function(next) {
       next();
     });
   });
-}
+};
+
+var Auth = function(query,cb) {
+ 	var self = this;
+ 	self.findOne({name:query.name},function(err,docs) {
+ 		if(err) return cb(err,null);
+	  bcrypt.compare(query.pass,docs.pass,function(err, isMatch) {
+	 		if(err) return cb(err,null);
+	 		return cb(null,docs);
+	  });
+ 	});
+};
 
 schema.pre("save",encryptPass);
+schema.statics.Auth = Auth;
 
 module.exports = function(key,jwt) {
 

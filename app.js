@@ -32,7 +32,7 @@ var routes = require('./routes/routes.js')(key,auth,model);
 app.use(session({
 	secret:key,
 	exp:5
-}).unless({path: ['/login','/account']}));
+}).unless({path: ['/login','/account','/u/:name']}));
 app.use(auth.verifyToken);
 
 

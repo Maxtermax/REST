@@ -1,5 +1,6 @@
 module.exports = function(model) {
 	var profile = function(req,res) {
+		console.log(req.params,'req.params');
  		var usuario = new model();
  		var token = req.headers.authorization || false;
    	if( token && token.split(' ')[0] === 'Bearer') {
