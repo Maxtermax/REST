@@ -8,8 +8,7 @@ var express 		= require("express")//express 4
 ,		key  				= fs.readFileSync("secret/key.txt")
 ,		jwt 				= require("jsonwebtoken")
 ,		session			= require("express-jwt")
-,		model 			= require("./model/model.js")(key,jwt)
-,		_           = require("underscore"); 
+,		model 			= require("./model/model.js")(key,jwt);
 
 app.set('view engine', 'html');
 app.set('views', __dirname + '/app/views');
@@ -32,7 +31,7 @@ var routes = require('./routes/routes.js')(key,auth,model);
 app.use(session({
 	secret:key,
 	exp:5
-}).unless({path: ['/login','/account','/u/:name']}));
+}).unless({path: ['/login','/account']}));
 app.use(auth.verifyToken);
 
 

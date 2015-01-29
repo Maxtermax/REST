@@ -3,24 +3,17 @@ var auth = function(key,jwt) {
 	var genToken = function(user) {
 		var token = jwt.sign({name:user.name,"ID":user['ID']},key,{expiresInMinutes:5})
 		return token;
-	};// genToken
+	};//end generate Token
 
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
 		if(err){
-			if(req.method === 'GET') {
-				next();
-				console.log('NO TOKEN SOLO QUIERO LA VISTA NORMAL');
-			}else {
-				res.status(err.status).send(err);
-				console.log('no autorizado ');
-			};
+			if(req.method === 'GET') return next();
+			res.status(err.status).send(err);
 		}else{
-			console.log('SIGASE');
 			next();
 		}
-	}
-
+	}//end verifyToken
 
 	return {
 		'genToken'   : genToken,
