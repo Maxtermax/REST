@@ -3,7 +3,7 @@
 var news = function ($http) {
 	return {
 		Last	: function(token){
-			$http({url: '/', method: 'POST',headers:{Authorization:"Bearer "+token} })
+			$http({url: '/', method:'POST',headers:{Authorization:"Bearer "+token} })
 		}
 
 	}

@@ -70,11 +70,11 @@ var encryptPass = function(next) {
 
 var Auth = function(query,cb) {
  	var self = this;
- 	self.findOne({name:query.name},function(err,docs) {
+ 	self.findOne({name:query.name},function(err,doc) {
  		if(err) return cb(err,null);
-	  bcrypt.compare(query.pass,docs.pass,function(err, isMatch) {
+	  bcrypt.compare(query.pass,doc.pass,function(err, isMatch) {
 	 		if(err) return cb(err,null);
-	 		return cb(null,docs);
+	 		return cb(null,doc);
 	  });
  	});
 };

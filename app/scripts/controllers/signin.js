@@ -1,7 +1,6 @@
-var controller = function ($scope,singUp,$location,$window) {
+var signInCtrl = function ($scope,auth,$location) {
 	$scope.submitData = function(info) {
-		console.log('fewfew');
-		singUp.register('/account',info)
+		auth.signIn(info)
 			.success(function(data,status,header,config) {
 				console.log(data,status);
 				$location.path("/login");
@@ -21,4 +20,4 @@ var controller = function ($scope,singUp,$location,$window) {
 
 
 angular.module('chatApp')
-.controller('AccountCtrl',controller)	
+	.controller('signInCtrl',signInCtrl)	

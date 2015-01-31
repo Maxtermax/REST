@@ -2,7 +2,7 @@
 
 var HomeCtrl = function($scope,$window,auth) {
 	var token = $window.sessionStorage.token;
-	auth.verifyToken({'key':token,'url':'/',method:'POST'})
+	auth.verifyToken('/','POST',token)
 		.success(function(data,status,header,config) {
 			console.log(status,'status');
 			$scope.users = data;
@@ -12,11 +12,7 @@ var HomeCtrl = function($scope,$window,auth) {
 	 		delete $window.sessionStorage.token;
 	 		if(status === 403) console.log('TokenExpired');
 	 		if(status === 401)	console.log('Unauthorized'); 
-
 	 	});
-	 	
-
-
 };
 
 

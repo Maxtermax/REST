@@ -8,9 +8,9 @@ var configRoutes = function($routeProvider) {
 		  templateUrl   : 'views/login.html',
 		  controller    : 'LoginCtrl'
 		})
-		.when('/account', {
-		  templateUrl   : 'views/account.html',
-		  controller    : 'AccountCtrl'
+		.when('/signin', {
+		  templateUrl   : 'views/signin.html',
+		  controller    : 'signInCtrl'
 		})
 		.when('/u/:name', {
 		  templateUrl: 'views/profile.html',
@@ -22,11 +22,12 @@ var configRoutes = function($routeProvider) {
 
 };//Routes config
 
-var run = function($rootScope,$location,$window,$route) {
+
+var run = function($rootScope,$location,$window,$route,auth) {
 	$rootScope.$on('$routeChangeStart', function(event, next, current) {
-		var token = $window.sessionStorage.token;
-		var path = $location.$$path; 
+
 	});
+
 };
 
 var Chat = angular.module("chatApp",[

@@ -3,7 +3,7 @@ var ProfileCtrl = function ($window,$scope,auth,$route) {
 	var token = $window.sessionStorage.token;
 	var url = "/u/"+$route.current.params.name;
 
-	auth.verifyToken({'key':token,'url':url,method:'GET'})
+	auth.verifyToken(url,'GET',token)
 		.success(function(data,status,header,config) {
 			console.log(status,'status');
 			$scope.usuario = data;
