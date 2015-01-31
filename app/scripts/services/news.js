@@ -2,9 +2,10 @@
 
 var news = function ($http) {
 	return {
-		Last	: function(token){
-			$http({url: '/', method:'POST',headers:{Authorization:"Bearer "+token} })
+		getAll:function(url,method,token) {
+		  return $http({'url':url,'method':method,headers:{Authorization:"Bearer "+token} });
 		}
+
 
 	}
 

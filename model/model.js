@@ -72,10 +72,24 @@ var Auth = function(query,cb) {
  	var self = this;
  	self.findOne({name:query.name},function(err,doc) {
  		if(err) return cb(err,null);
-	  bcrypt.compare(query.pass,doc.pass,function(err, isMatch) {
-	 		if(err) return cb(err,null);
-	 		return cb(null,doc);
-	  });
+ 		if(!doc) {
+ 			return cb({
+		 		success:false,
+		 		message:'user not found'
+		 	}); 
+ 		}else {
+		  bcrypt.compare(query.pass,doc.pass,function(err, isMatch) {
+		 		if(err) return cb(err,null);
+		 		if(isMatch) {
+		 			return cb(null,doc);
+		 		}else {
+		 			return cb({
+		 				success:false,
+		 				message:'bad password'
+		 			}); 			
+		 		};
+		  });
+		};
  	});
 };
 
@@ -84,9 +98,11 @@ var getNews = function(cb) {
 	self.find({},function(err,docs) {
 		if(err) return cb({
 			success:false,
+			status:500,
 			message:'He could not consult the database',
-			err		 : err
+			err:err
 		});	
+			
 		if(docs){
 			if(_.isArray(docs)) {
 				var news = _.map(docs,function(doc) { 
@@ -96,7 +112,8 @@ var getNews = function(cb) {
 			}else{
 				var doc = docs;
 				return cb(null,{name:doc.name,email:doc.email});
-			};
+			};//filter the data for dont show pass an more data
+			
 		}	
 	});
 };
@@ -113,9 +130,9 @@ module.exports = function(key,jwt) {
 		  	self.model('user').findOne(query,function(err,docs) {
 			 		if(decode && docs && String(docs["_id"]) === decode["ID"] ) {
 			 			//complete view
+			 			var doc = _.omit(docs["_doc"],'pass','_id','__v','isLogin');
 			 			console.log('Complete view');
-			 			docs.limit = false;
-			 			return cb(null,docs);
+			 			return cb(null,doc);
 			 		}else if(err){
 			 			console.log(err);
 			 			//something wrong in the query
@@ -123,12 +140,9 @@ module.exports = function(key,jwt) {
 			 		}else{ 
 			 			//Limit view 
 			 			console.log('Limit view');
-			 			return cb(null,{
-			 				name:docs.name,
-			 				email:docs.email,
-			 				limit:true
-			 			});				 		
-			 		
+			 			var doc =  _.pick(docs["_doc"],'email', 'name');//return only the email and name
+			 			doc.limit = true;
+			 			return cb(null,doc);				 		
 			 		}
 			 	});//end find with token	  		
 

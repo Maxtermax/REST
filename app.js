@@ -37,7 +37,8 @@ app.use(auth.verifyToken);
 
 app.get('/',function(req,res) {
 	res.sendFile(__dirname+'/app/views/index.html');
-}).route('/').post(routes.news);
+})
+app.route('/news').get(routes.news);
 
 app.route('/signin').post(routes.signin);
 

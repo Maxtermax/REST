@@ -7,24 +7,28 @@ module.exports = function(auth,model) {
 					var token = auth.genToken({name:user.name,"ID":user['_id']});
 					//create token with the user information
 					//token available for 5min
-					res.send({token:token});
-				}else if(err){
+					res.send({
+						success:true,
+						token:token,
+						message:'welcome login success :)'
+					});
+				}else if(err && !err.message){
 					res.status(500).send({
 						success:false,
 						message:'could not authenticate the user tries again',
 						err:err
 					});
-				}else {
-					res.status(404).send({
-						success:false,
-						message:'user not found'
-					});
+				}else if(err && err.message) {
+					if(err.message === 'bad password') res.status(400).send(err);
+					if(err.message === 'user not found') res.status(400).send(err);
 				};
-			});		
+
+			});	
+
 		}else {
 			res.status(400).send({
 				success:false,
-				message:'no username and password in the body from request'
+				message:'the request has no parameters required at body'
 			})
 		}
 		
