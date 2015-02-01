@@ -54,77 +54,72 @@ var schema = new Schema({
 	}]
 });
 
-var encryptPass = function(next) {
-	var self = this;
-	bcrypt.genSalt(10, function(err, salt) {
-		//generate salt = 'fwefe23o2mr3ion12' to mix with the pass
-    if (err) return next(err);
-    bcrypt.hash(self.pass,salt, function(err, hash) {
-     // override the textplain password with the hashed one
-      if (err) return next(err);
-      self.pass = hash;
-      next();
-    });
-  });
-};
-
-var Auth = function(query,cb) {
- 	var self = this;
- 	self.findOne({name:query.name},function(err,doc) {
- 		if(err) return cb(err,null);
- 		if(!doc) {
- 			return cb({
-		 		success:false,
-		 		message:'user not found'
-		 	}); 
- 		}else {
-		  bcrypt.compare(query.pass,doc.pass,function(err, isMatch) {
-		 		if(err) return cb(err,null);
-		 		if(isMatch) {
-		 			return cb(null,doc);
-		 		}else {
-		 			return cb({
-		 				success:false,
-		 				message:'bad password'
-		 			}); 			
-		 		};
-		  });
-		};
- 	});
-};
-
-var getNews = function(cb) {
-	var self = this;
-	self.find({},function(err,docs) {
-		if(err) return cb({
-			success:false,
-			status:500,
-			message:'He could not consult the database',
-			err:err
-		});	
-			
-		if(docs){
-			if(_.isArray(docs)) {
-				var news = _.map(docs,function(doc) { 
-					return {name:doc.name,email:doc.email} 
-				});//filter the data for dont show pass an more data
-				return cb(null,news);
-			}else{
-				var doc = docs;
-				return cb(null,{name:doc.name,email:doc.email});
-			};//filter the data for dont show pass an more data
-			
-		}	
-	});
-};
-
-schema.pre("save",encryptPass);//hashed the pass before save into the store 
-schema.statics.Auth = Auth;//authenticate comparing the password candidate and the pass hashed
-schema.statics.getNews = getNews;
 
 module.exports = function(key,jwt) {
 
-	schema.methods.getProfile = function(query,token,cb) {
+	var genHash = function(pass,cb) {
+		bcrypt.genSalt(10, function(err, salt) {
+			//generate salt = 'fwefe23o2mr3ion12' to mix with the pass
+			if(err) return cb(err);
+			bcrypt.hash(pass,salt, function(err, hash) {
+			  // override the textplain password with the hashed one
+				if(err) return cb(err);
+				if(hash)return cb(null,hash);
+			});
+		});
+	};//end genHash
+
+	var encryptPass = function(next) {
+		var self = this;
+		genHash(self.pass,function(err,hash) {
+			if(err) return next(err);
+			self.pass = hash;
+			next();
+		});
+	};//end encryptPass
+
+	var login = function(query,cb) {
+	 	var self = this;
+	 	self.findOne({name:query.name},function(err,doc) {
+	 		if(err) return cb(err,null);
+	 		if(!doc) {
+	 			return cb({success:false,message:'user not found'}); 
+	 		}else {
+			  bcrypt.compare(query.pass,doc.pass,function(err, isMatch) {
+			 		if(err) return cb(err,null);
+			 		if(isMatch) return cb(null,doc);
+			 		else return cb({success:false,message:'bad password'}); 			
+			  });//compare
+			};//user find
+	 	});//store query
+	};//end login
+
+	var getNews = function(cb) {
+		var self = this;
+		self.find({},function(err,docs) {
+			if(err) return cb({
+				success:false,
+				status:500,
+				message:'He could not consult the database',
+				err:err
+			});	
+				
+			if(docs){
+				if(_.isArray(docs)) {
+					var news = _.map(docs,function(doc) { 
+						return {name:doc.name,email:doc.email} 
+					});//filter the data for dont show pass an more data
+					return cb(null,news);
+				}else{
+					var doc = docs;
+					return cb(null,{name:doc.name,email:doc.email});
+				};//filter the data for dont show pass an more data
+				
+			}	
+		});
+	};//end getNews
+
+	var getProfile= function(query,token,cb) {
   	var self = this;
 	  jwt.verify(token,key,function(err,decode) {
 		  	self.model('user').findOne(query,function(err,docs) {
@@ -137,13 +132,15 @@ module.exports = function(key,jwt) {
 			 			console.log(err);
 			 			//something wrong in the query
 			 			return cb(err,null);
-			 		}else{ 
+			 		}else if(docs){ 
 			 			//Limit view 
 			 			console.log('Limit view');
 			 			var doc =  _.pick(docs["_doc"],'email', 'name');//return only the email and name
 			 			doc.limit = true;
 			 			return cb(null,doc);				 		
-			 		}
+			 		}else {
+			 			return cb({status:404,success:false,message:'user no found'});				 					 			
+			 		};
 			 	});//end find with token	  		
 
 	  });//end verify
@@ -152,6 +149,78 @@ module.exports = function(key,jwt) {
 			return the limit view of the user in request
 	  */
 	}//end getProfile
+
+	var update = function(token,update,cb) {
+		var self  = this;
+		var model = self.model('user');
+
+		jwt.verify(token,key,function(err,decode) {
+			//get ID by token
+			if(err) return cb(err);
+			if(_.has(decode,'ID')) {
+				var id = decode['ID']; 
+				if(_.has(update,'pass')) {
+					model.findById(id,function(err,docs) {
+						if(err) return cb(err);
+						if(!docs) return cb({success:false,message:'user no found'});
+						bcrypt.compare(update.pass,docs.pass,function(err,isMatch) {
+							if(err) return cb(err);
+							if(isMatch) {
+								if(_.has(update,'newpass')) {
+									genHash(update.newpass,function(err,hash) {
+										if(err) return cb(err);
+										update.newpass = hash;
+										update.pass = update.newpass; 
+										model.findByIdAndUpdate(id,update,function(err,docs) {
+											if(err) return cb(err);
+											return cb(null,docs);
+										});
+									});
+								}else {
+									delete update.pass;
+									model.findByIdAndUpdate(id,update,function(err,docs) {
+										if(err) return cb(err);
+										return cb(null,docs);
+									});	
+								}
+							}else {
+								return cb({success:false,message:'bad password'});
+							}
+						});
+					});
+				}else {
+						return cb({success:false,message:'password required'});
+				}
+			}else {
+				return cb({success:false,message:'bad token'});
+			}
+		});
+	};//new update
+	
+	var remove = function(token,cb) {
+		var self = this;
+		var model = self.model('user');
+		jwt.verify(token,key,function(err,decode) {
+			if(err) return cb(err);
+			if(_.has(decode,'ID')) {
+				model.findByIdAndRemove(decode['ID'],function(err,docs) {
+					if(err)  return cb(err);
+					if(docs) return cb(null,docs);
+					if(!docs)return cb({status:404,success:false,message:'user no found'});
+				});
+			}else {
+				return cb({status:404,success:false,message:'Bad token'});
+			}
+		});
+
+	};//end remove
+
+	schema.statics.update = update;
+	schema.statics.remove = remove;
+	schema.statics.login = login;
+	schema.statics.getNews = getNews;
+	schema.methods.getProfile = getProfile;
+	schema.pre("save",encryptPass); 
 
 	return mongoose.model('user',schema);
 };

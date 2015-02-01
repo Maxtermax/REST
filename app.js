@@ -34,10 +34,15 @@ app.use(session({
 }).unless({path: ['/login','/signin']}));
 app.use(auth.verifyToken);
 
+app.param('id',function(req,res,next,id) {
+	req.id = id;
+	next();
+});
 
 app.get('/',function(req,res) {
 	res.sendFile(__dirname+'/app/views/index.html');
 })
+
 app.route('/news').get(routes.news);
 
 app.route('/signin').post(routes.signin);
@@ -46,7 +51,9 @@ app.route('/login').post(routes.login);
 
 app.route('/u/:name').get(routes.profile);
 
+app.route('/update').put(routes.update);
 
+app.route('/delete/:id').delete(routes.delete);
 
 //web sockets
 io.on("connection",function(socket){

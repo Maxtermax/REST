@@ -8,7 +8,9 @@ var auth = function(key,jwt) {
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
 		if(err){
-			if(req.method === 'GET') {
+			if(req.method === 'DELETE') {
+				return next();
+			}else if(req.method === 'GET') {
 				if(path === '/news') res.status(err.status).send(err);
  				else next();
 			}else {
