@@ -1,5 +1,5 @@
 #Note
- this project is in develoment rigth now
+ Status = development
  Promises
 * FULL-REST-API
 * Secure data encryption
