@@ -1,3 +1,12 @@
+#Note
+ this project is in develoment rigth now
+ Promises
+* FULL-REST-API
+* Secure data encryption
+* Session support
+* File support 
+* Web socket real time connection
+
 # MEAN
 Simple mean stack testing repository.
 
