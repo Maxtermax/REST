@@ -5,9 +5,15 @@ module.exports = function(auth,model) {
 			model.login({name:b.name,pass:b.pass},function(err,user) {
 				if(user) {
 					var token = auth.genToken({name:user.name,"ID":user['_id']});
-					res.send({success:true,token:token,message:'welcome login success :)'});
+					res.send({
+						scope:'/news /u/*',
+						success:true,
+						access_token:token,
+						message:'welcome login success :)'
+				});
+
 				}else if(err && !err.message){
-					res.status(500).send({success:false,message:'could not authenticate the user tries again',err:err});
+					res.status(500).send({success:false,err:err});
 				}else if(err && err.message) {
 					if(err.message === 'bad password') res.status(400).send(err);
 					if(err.message === 'user not found') res.status(400).send(err);

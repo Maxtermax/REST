@@ -222,7 +222,12 @@ module.exports = function(key,jwt) {
 	schema.methods.getProfile = getProfile;
 	schema.pre("save",encryptPass); 
 
-	return mongoose.model('user',schema);
+	return {
+		user:mongoose.model('user',schema),
+		mongo:mongoose,
+		_:_
+	}
+	
 };
 
 
