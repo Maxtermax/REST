@@ -6,7 +6,7 @@ var mongoose = require('mongoose')
 
 
 mongoose.connect('mongodb://localhost/MEAN',function(err,res){
-	if(err) console.log(err);
+	if(err) console.log(err,'ERROR');
 	else 		console.log("Conect at: MEAN");
 });
 
