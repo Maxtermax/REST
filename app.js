@@ -70,28 +70,59 @@ var gfs = model_file;
 var multer = require('multer')
 
 app.post('/fs/upload',multer({
-	upload:null,
-	onFileUploadStart:function(file){		
+	upload:null,//take uploading process 
+	catch:[],
+	onFileUploadStart:function(file){
+		//set upload with WritableStream		
 		this.upload = gfs.createWriteStream({
-			filename:file.originalname,
+			filename:file.name,
 			mode:"w",
 			chunkSize:1024*4,
 			content_type:file.mimetype,
-			root:"fs"
-		});
+			root:"fs",
+			metadata:{
+				name:file.originalname
+			}
 
+		});
 	},
 	onFileUploadData:function(file,data) {
-		this.upload.write(data);
+		var lose_data = this.catch;
+		var upload = this.upload;
+		//put the chucks into db 
+		if(!upload.write(data)) lose_data.push(data);
+
 	},
 	onFileUploadComplete:function(file) {
-		this.upload.end();
+		//end process 
+		var lose_data = this.catch;
+		var upload = this.upload;
+		upload.on('drain',function() {
+			console.log(lose_data);		
+			upload.end();
+		});
 	}
+
 }),function(req,res) {
-	res.sendStatus(200);
+	res.send(req.files);
 });
 
-app.route('/fs/download/:file').get(routes.download_fs);
+app.route('/fs/download/:file').get(function(req,res) {
+	var name = req.params.file;
+	gfs.files.find({filename:name}).toArray(function(err,file) {
+		if(err) return res.send(err);
+		var len = file[0]['length'];
+		var progress = 0;
+		gfs.createReadStream({filename:name})
+			.on('data',function(data) {
+				progress += data.length
+				console.log('PROGRESS',Math.ceil((progress/len)*100),'%');
+			})
+			.pipe(res.type('video/mp4'));
+	});
+
+
+});
 
 //web sockets
 io.on("connection",function(socket){
