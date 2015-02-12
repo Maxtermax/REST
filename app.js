@@ -11,7 +11,8 @@ var express 		= require("express")//express 4
 ,		model 			= require("./model/model.js")(key,jwt)
 ,		model_file 	= require("./model/model_file.js")(model.mongo,fs,model._)
 ,		auth   			= require("./auth/auth.js")(key,jwt)
-,		routes 			= require('./routes/index.js')(auth,model,model_file);
+,		routes 			= require('./routes/index.js')(auth,model,model_file)
+,		multer 			= require('multer');
 
 
 app.set('view engine', 'html');
@@ -19,10 +20,8 @@ app.set('views', __dirname + '/app/views');
 
 app.use(cors());
 app.use(require('morgan')('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
 app.use(require('method-override')());
-//app.use(require('multer')());
+app.use(multer());
 
 
 app.use(express.static(__dirname+"/"));
@@ -67,8 +66,7 @@ app.route('/u/delete/:id').delete(routes.delete);
 	*/
 var gfs = model_file;
 
-var multer = require('multer')
-
+/*
 app.post('/fs/upload',multer({
 	upload:null,//take uploading process 
 	catch:[],
@@ -123,6 +121,7 @@ app.route('/fs/download/:file').get(function(req,res) {
 
 
 });
+*/
 
 //web sockets
 io.on("connection",function(socket){

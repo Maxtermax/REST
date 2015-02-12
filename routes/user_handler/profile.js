@@ -6,7 +6,7 @@ module.exports = function(model) {
  		,		key			= token.split(' ')[1];
 
    	if( method === 'Bearer') {
-    	user.getProfile({'name':req.params.name},key,function(err,docs) {
+    	user.getProfile({'username':req.params.name},key,function(err,docs) {
         if(err) res.status(err.status || 500).send({success:false,message:'Ooops!',err:err});
         else res.send(docs);             
     	});     	

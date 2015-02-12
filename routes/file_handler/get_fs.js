@@ -1,5 +1,5 @@
 module.exports = function(model_file) {
-	var download = function(req,res) {
+	return function(req,res) {
 		model_file.get(req.params.file,function(err,file,data) {
 			if(err) return res.send(err);		
 			
@@ -20,5 +20,4 @@ module.exports = function(model_file) {
 		});
 	};
 
-	return download;
 }
