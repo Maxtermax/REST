@@ -1,19 +1,21 @@
-var auth = function(key,jwt) {	
+var auth = function(key,jwt,model) {	
 
 	var genToken = function(user) {
 		var token = jwt.sign({name:user.name,"ID":user['ID']},key,{expiresInMinutes:5})
 		return token;
-	};//end generate Token
+	}//end generate Token
 
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
-		if(err){
+		console.log(model.db,'model.logout');
+		if(err) {
 			if(req.method === 'DELETE') {
 				return next();
 			}else if(req.method === 'GET') {
-				if(path === '/news') res.status(err.status).send(err);
+				if(path === '/post') res.status(err.status).send(err);
  				else next();
 			}else {
+				console.log(err);
 				res.status(err.status).send(err);	
 			}
 		}else{
@@ -22,10 +24,11 @@ var auth = function(key,jwt) {
 	}//end verifyToken
 
 	return {
-		'genToken'   : genToken,
-		'verifyToken': verifyToken
+		genToken: genToken,
+		verifyToken: verifyToken
 	}
-}
+
+};
 	
 
 module.exports = auth;

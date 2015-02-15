@@ -10,7 +10,7 @@ var express 		= require("express")//express 4
 ,		session			= require("express-jwt")
 ,		model 			= require("./model/model.js")(key,jwt)
 ,		model_file 	= require("./model/model_file.js")(model.mongo,fs,model._)
-,		auth   			= require("./auth/auth.js")(key,jwt)
+,		auth   			= require("./auth/auth.js")(key,jwt,model)
 ,		routes 			= require('./routes/index.js')(auth,model,model_file)
 ,		multer 			= require('multer');
 
@@ -30,7 +30,7 @@ app.use(express.static(__dirname+"/app"));
 app.use(session({
 	secret:key,
 	exp:5
-}).unless({path: ['/login','/fs/upload','/signin','/algo']}));
+}).unless({path: ['/login','/fs/upload','/signin']}));
 app.use(auth.verifyToken);
 
 app.param('id',function(req,res,next,id) {
@@ -47,7 +47,7 @@ app.get('/',function(req,res) {
 		USER REGISTER
 	/////////////////////////////
 	*/
-app.route('/news').get(routes.news);
+app.route('/post').get(routes.news);
 app.route('/signin').post(routes.signin);
 app.route('/login').post(routes.login);
 	/*
@@ -58,6 +58,18 @@ app.route('/login').post(routes.login);
 app.route('/u/:name').get(routes.profile);
 app.route('/u/update').put(routes.update);
 app.route('/u/delete/:id').delete(routes.delete);
+
+	/*
+	////////////////////////////
+		POST SERVICES
+	////////////////////////////
+	*/
+app.route('/new_post').post(routes.new_post);
+
+
+
+
+
 
 	/*
 	////////////////////////////

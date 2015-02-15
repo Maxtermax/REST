@@ -6,16 +6,19 @@ var mongoose = require('mongoose')
 ,		genHash = require('./resources/genHash.js')(bcrypt);
 
 
-mongoose.connect('mongodb://localhost/MEAN',function(err,res){
+mongoose.connect('mongodb://localhost/nuevo',function(err,res){
 	if(err) console.log(err,'ERROR');
-	else 		console.log("Conect at: MEAN");
+	else 		console.log("Conect at: nuevo");
 });
 
 var schema = new Schema({
 	username:{type:String,unique:true},
 	password:{type:String,unique:true},
+	isLogin:{type:Boolean,default:false},
+	loginAttemps:{type:Number},
+	isLooked:{type:Boolean,default:false},
 	post:[{
-		username:String,
+		title:String,
 		body:String,
 		pic :String,
 		_id:String,
@@ -40,7 +43,6 @@ var schema = new Schema({
 		audio:[{type:String}],
 		docs:{pdf:[{type:String}]}
 	},
-	isLogin:{type:Boolean,default:true},
 	contactos:[{
 		username:String,
 		message:[{
@@ -55,13 +57,29 @@ var schema = new Schema({
 	}]
 });
 
+
+
+
 module.exports = function(key,jwt) {
+
+	schema.statics.logout = function(query,cb) {
+		var self = this;
+		self.model('user').findOneAndUpdate(query,{isLogin:false},function(err,docs) {
+			if(err) return cb(err);
+			if(!docs) return cb({sucess:false,message:'user not found'});
+			if(docs) return cb(null,docs);
+		})
+	};
+
+	
+
 
 	schema.methods.getProfile = require('./resources/getProfile.js')(_,jwt,key);
 	schema.statics.getNews    = require('./resources/getNews.js')(_);
 	schema.statics.update     = require('./resources/update.js')(_,genHash,jwt,key,bcrypt);
 	schema.statics.remove     = require('./resources/remove.js')(_,key,jwt);
-	schema.statics.login      = require('./resources/login.js')(bcrypt);;
+	schema.statics.login      = require('./resources/login.js')(bcrypt);
+	schema.statics.new_post   = require('./resources/new_post.js')(_,jwt,key);
 	schema.pre("save",require('./resources/encryptPass.js')(genHash)); 
 
 	return {

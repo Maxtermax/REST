@@ -8,6 +8,7 @@ module.exports = function(auth,model,_) {
 		var b = req.body || {};	
 		if(_.has(b,'password','username')) {
 			model.login({username:b.username,password:b.password},function(err,user) {
+				if(err && err.message === 'user is login') return res.status(403).send(err);
 				if(err && err.message === 'bad password') return res.status(400).send(err);
 				if(err && err.message === 'user not found') return res.status(404).send(err);
 				if(err && !err.message)	return res.status(500).send({success:false,err:err,message:'Oops al parecer hubo un error interno en el servidor'});

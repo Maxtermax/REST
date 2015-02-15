@@ -1,5 +1,6 @@
 var uPath  = "./user_handler/"
 ,		fsPath = "./file_handler/"
+,		postPath = "./post_handler/";
 
 module.exports = function(auth,model,model_file) {
 	return {
@@ -9,6 +10,7 @@ module.exports = function(auth,model,model_file) {
 		news   		: require(uPath+'news.js')(model.user),
 		update 		: require(uPath+'update.js')(model.user),
 		delete 		: require(uPath+'delete.js')(model.user),
+		new_post	: require(postPath+'new_post.js')(model["_"],model.user),
 		upload_fs : require(fsPath+'upload_fs.js')(model_file),
 		get_fs    : require(fsPath+'get_fs.js')(model_file,model["_"])	
 	}	
