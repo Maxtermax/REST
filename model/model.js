@@ -57,9 +57,6 @@ var schema = new Schema({
 	}]
 });
 
-
-
-
 module.exports = function(key,jwt) {
 
 	schema.statics.logout = function(query,cb) {
@@ -71,15 +68,13 @@ module.exports = function(key,jwt) {
 		})
 	};
 
-	
-
-
 	schema.methods.getProfile = require('./resources/getProfile.js')(_,jwt,key);
-	schema.statics.getNews    = require('./resources/getNews.js')(_);
+	schema.statics.onePost    = require('./resources/onePost.js')(_);
+	schema.statics.allPost    = require('./resources/allPost.js')(_);
 	schema.statics.update     = require('./resources/update.js')(_,genHash,jwt,key,bcrypt);
 	schema.statics.remove     = require('./resources/remove.js')(_,key,jwt);
 	schema.statics.login      = require('./resources/login.js')(bcrypt);
-	schema.statics.new_post   = require('./resources/new_post.js')(_,jwt,key);
+	schema.statics.createPost = require('./resources/createPost.js')(_,jwt,key,id);
 	schema.pre("save",require('./resources/encryptPass.js')(genHash)); 
 
 	return {
@@ -89,6 +84,8 @@ module.exports = function(key,jwt) {
 	}
 
 };
+
+
 
 
 

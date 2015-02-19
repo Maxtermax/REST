@@ -3,7 +3,6 @@ var express 		= require("express")//express 4
 ,		server 			= require("http").createServer(app)
 ,		io 					= require("socket.io")(server)//socket last version
 ,		fs 					= require("fs")
-,		bodyParser 	= require("body-parser")
 ,		cors 				= require("cors")
 ,		key  				= fs.readFileSync("secret/key.txt")
 ,		jwt 				= require("jsonwebtoken")
@@ -14,68 +13,68 @@ var express 		= require("express")//express 4
 ,		routes 			= require('./routes/index.js')(auth,model,model_file)
 ,		multer 			= require('multer');
 
-
-app.set('view engine', 'html');
-app.set('views', __dirname + '/app/views');
-
-app.use(cors());
-app.use(require('morgan')('dev'));
-app.use(require('method-override')());
-app.use(multer());
-
-
-app.use(express.static(__dirname+"/"));
-app.use(express.static(__dirname+"/app"));
-
-app.use(session({
-	secret:key,
-	exp:5
-}).unless({path: ['/login','/fs/upload','/signin']}));
-app.use(auth.verifyToken);
-
-app.param('id',function(req,res,next,id) {
-	req.id = id;
-	next();
-});
+	/*
+	/////////////////////////////
+		EXPRESS CONFIGURATIONS
+	/////////////////////////////
+	*/
+app
+	.set('view engine', 'html')
+	.set('views', __dirname + '/app/views')
+	.use(cors())//middlewares acess among server's 
+	.use(require('morgan')('dev'))//middleware debug
+	.use(require('method-override')())//middleware put and delete request
+	.use(multer())//middleware post and file request
+	.use(express.static(__dirname+"/"))//statics resources
+	.use(express.static(__dirname+"/app"))//statics resources
+	.use(session({secret:key,exp:5}).unless({
+		path: ['/login','/fs/upload','/signin']
+	}))//session routes
+	.use(auth.verifyToken)// verify acess token
+	.param('id',function(req,res,next,id) {
+		req.id = id;
+		next();
+	})
+	.param('name',function(req,res,next,name) {
+		req.name = name;
+		next();
+	})
 
 app.get('/',function(req,res) {
 	res.sendFile(__dirname+'/app/views/index.html');
 });
 
-	/*
-	/////////////////////////////
-		USER REGISTER
-	/////////////////////////////
-	*/
-app.route('/post').get(routes.news);
+/*
+/////////////////////////////
+	USER REGISTER
+/////////////////////////////
+*/
+app.route('/u/:name/post/:id').get(routes.onePost);
+app.route('/u/:name/post').get(routes.allPost);
 app.route('/signin').post(routes.signin);
 app.route('/login').post(routes.login);
-	/*
-	/////////////////////////////
-		USER SERVICES
-	/////////////////////////////
-	*/
+
+/*
+/////////////////////////////
+	USER SERVICES
+/////////////////////////////
+*/
 app.route('/u/:name').get(routes.profile);
 app.route('/u/update').put(routes.update);
 app.route('/u/delete/:id').delete(routes.delete);
 
-	/*
-	////////////////////////////
-		POST SERVICES
-	////////////////////////////
-	*/
-app.route('/new_post').post(routes.new_post);
+/*
+////////////////////////////
+	POST SERVICES
+////////////////////////////
+*/
+app.route('/new_post').post(routes.createPost);
 
-
-
-
-
-
-	/*
-	////////////////////////////
-		FILE SYSTEM
-	////////////////////////////
-	*/
+/*
+////////////////////////////
+	FILE SYSTEM
+////////////////////////////
+*/
 var gfs = model_file;
 
 /*
