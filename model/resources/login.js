@@ -1,25 +1,15 @@
-module.exports = function(bcrypt) {
+module.exports = function(_,bcrypt) {
    return function(query,cb) {
 	 	var self = this;
-	 	self.findOneAndUpdate({username:query.username},{isLogin:true},function(err,doc) {
-	 		if(err) return cb(err,null);
-	 		if(!doc) return cb({success:false,message:'user not found'}); 		
-			bcrypt.compare(query.password,doc.password,function(err, isMatch) {
-				//user find
-		 		if(err) return cb(err,null);
-		 		if(isMatch) {
-		 			if(doc.isLooked) cb({success:false,message:'user is locked'});;
-		 			return cb(null,doc);	
-		 		}else {
-		 			return cb({success:false,message:'bad password'}); 			
-		 		}
-		 			
-		 			
-
-		  })//compare
-
-	 	});//match query
-
-	};//end login
-
-}
+	 	self.model('user').findOne({username:query.username},function(err,docs) {
+		 console.log(query.password,docs.password,'query.password,docs.password');
+	 		if(err) return cb(_.extend(err,{status:500,message:'Ooops !!!'}));
+	 		if(_.isEmpty(docs)) return cb({status:404,message:'The user not was found'});
+	 		bcrypt.compare(query.password,docs.password,function(err,isMatch) {
+	 			if(err) return cb(_.extend(err,{status:500,message:'Ooops !!!'}));
+	 			if(!isMatch) return cb({status:400,message:'Bad password'});
+	 			return cb(null,docs);
+	 		})
+	 	})//match query
+	}//end login
+};

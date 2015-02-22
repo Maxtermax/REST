@@ -5,7 +5,7 @@ module.exports = function(model) {
  		var method = token.split(' ')[0];
  		var key = token.split(' ')[1]; 
  		if(method === 'Bearer') {
- 			model.update(key,b,function(err,docs) {
+ 			model.upgrade(key,b,function(err,docs) {
  				if(err) res.send(err);
  				else 		res.send(docs);
  			});

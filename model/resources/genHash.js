@@ -7,11 +7,11 @@ module.exports =  function(bcrypt) {
 				  // override the textplain password with the hashed one
 					if(err) return cb(err);
 					if(hash)return cb(null,hash);
-				});
-			});
-	};//end genHash
+				})
+			})
+	}//end genHash
+}
 
-};
 
 
 

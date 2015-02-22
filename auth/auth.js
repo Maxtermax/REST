@@ -11,8 +11,12 @@ var auth = function(key,jwt,model) {
 		if(err) {
 			if(req.method === 'DELETE') {
 				return next();
+			}else if(req.method === 'POST' ) {
+				if(path === '/u/new/post') {
+					next();
+				}
 			}else if(req.method === 'GET') {
-				if(path === '/post') res.status(err.status).send(err);
+				if(path === '/post')  res.status(err.status).send(err);
  				else next();
 			}else {
 				console.log(err);

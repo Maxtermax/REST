@@ -8,9 +8,9 @@ var express 		= require("express")//express 4
 ,		jwt 				= require("jsonwebtoken")
 ,		session			= require("express-jwt")
 ,		model 			= require("./model/model.js")(key,jwt)
-,		model_file 	= require("./model/model_file.js")(model.mongo,fs,model._)
+,		gfs				 	= require("./model/model_file.js")(model.mongo,fs,model._)
 ,		auth   			= require("./auth/auth.js")(key,jwt,model)
-,		routes 			= require('./routes/index.js')(auth,model,model_file)
+,		routes 			= require('./routes/index.js')(auth,model,gfs)
 ,		multer 			= require('multer');
 
 	/*
@@ -24,7 +24,27 @@ app
 	.use(cors())//middlewares acess among server's 
 	.use(require('morgan')('dev'))//middleware debug
 	.use(require('method-override')())//middleware put and delete request
-	.use(multer())//middleware post and file request
+	.use(multer({
+		upload:null,//take uploading process 
+		onFileUploadStart:function(file){
+			//set upload with WritableStream
+				this.upload = gfs.createWriteStream({
+				filename:file.name,
+				mode:"w",
+				chunkSize:1024*4,
+				content_type:file.mimetype,
+				root:"fs",
+				metadata:{name:file.originalname}
+			})
+		},
+		onFileUploadData:function(file,data) {
+			this.upload.write(data);//put the chucks into db 
+		},
+		onFileUploadComplete:function(file) {
+			//end process 
+			this.upload.end();
+		}
+	}))//middleware post and file request
 	.use(express.static(__dirname+"/"))//statics resources
 	.use(express.static(__dirname+"/app"))//statics resources
 	.use(session({secret:key,exp:5}).unless({
@@ -49,8 +69,6 @@ app.get('/',function(req,res) {
 	USER REGISTER
 /////////////////////////////
 */
-app.route('/u/:name/post/:id').get(routes.onePost);
-app.route('/u/:name/post').get(routes.allPost);
 app.route('/signin').post(routes.signin);
 app.route('/login').post(routes.login);
 
@@ -68,14 +86,30 @@ app.route('/u/delete/:id').delete(routes.delete);
 	POST SERVICES
 ////////////////////////////
 */
-app.route('/new_post').post(routes.createPost);
+
+app.route('/u/:name/post/:id').get(routes.onePost);//get single post by id
+//app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
+app.route('/u/:name/post').get(routes.allPost);//get all pot from user
+app.route('/u/new/post').post(routes.createPost);//create post
+
+
+
+
+
 
 /*
 ////////////////////////////
 	FILE SYSTEM
 ////////////////////////////
 */
-var gfs = model_file;
+
+app.get('/statics/media/pictures/:name',function(req,res) {
+	gfs.files.find({filename:req.name}).toArray(function(err,file) {
+		if(err) return res.send(err);
+		gfs.createReadStream({filename:req.name}).pipe(res.type(file[0]['contentType']));
+	});
+});
+
 
 /*
 app.post('/fs/upload',multer({

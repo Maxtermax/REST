@@ -71,10 +71,11 @@ module.exports = function(key,jwt) {
 	schema.methods.getProfile = require('./resources/getProfile.js')(_,jwt,key);
 	schema.statics.onePost    = require('./resources/onePost.js')(_);
 	schema.statics.allPost    = require('./resources/allPost.js')(_);
-	schema.statics.update     = require('./resources/update.js')(_,genHash,jwt,key,bcrypt);
-	schema.statics.remove     = require('./resources/remove.js')(_,key,jwt);
-	schema.statics.login      = require('./resources/login.js')(bcrypt);
+	schema.statics.upgrade    = require('./resources/upgrade.js')(_,genHash,jwt,key,bcrypt);
+	schema.statics.unlink     = require('./resources/unlink.js')(_,key,jwt);
+	schema.statics.login      = require('./resources/login.js')(_,bcrypt);
 	schema.statics.createPost = require('./resources/createPost.js')(_,jwt,key,id);
+	schema.statics.updatePost = require('./resources/updatePost.js')(_);
 	schema.pre("save",require('./resources/encryptPass.js')(genHash)); 
 
 	return {

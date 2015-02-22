@@ -9,7 +9,8 @@ module.exports = function(_,model) {
 		if(!_.has(b,'title','body')) return res.status(401).send('missing data in the request');
 		model.createPost(token,{
 			title:b.title,
-			body:b.body
+			body:b.body,
+			images:[{url:req.files.file.name}]
 		},function(err,docs) {
 			if(err) return res.status(err.status).send(err);
 			res.send(docs.post);

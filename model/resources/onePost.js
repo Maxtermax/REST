@@ -7,6 +7,7 @@ module.exports = function(_) {
 		var post;
 		for (var i = 0; i < docs.post.length; i++) {
 			if(_.isEmpty(docs.post[i])) continue;
+				console.log(docs.post[i]);
 			if(docs.post[i]['_id'] === id) {
 				post = docs.post[i];
 				break;
