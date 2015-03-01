@@ -7,14 +7,11 @@ var auth = function(key,jwt,model) {
 
 	var verifyToken = function(err,req,res,next) {
 		var path = req.path;
-		console.log(model.db,'model.logout');
+		if(path === '/upload') return next();
+
 		if(err) {
 			if(req.method === 'DELETE') {
 				return next();
-			}else if(req.method === 'POST' ) {
-				if(path === '/u/new/post') {
-					next();
-				}
 			}else if(req.method === 'GET') {
 				if(path === '/post')  res.status(err.status).send(err);
  				else next();

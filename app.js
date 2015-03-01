@@ -18,33 +18,45 @@ var express 		= require("express")//express 4
 		EXPRESS CONFIGURATIONS
 	/////////////////////////////
 	*/
-app
-	.set('view engine', 'html')
-	.set('views', __dirname + '/app/views')
-	.use(cors())//middlewares acess among server's 
-	.use(require('morgan')('dev'))//middleware debug
-	.use(require('method-override')())//middleware put and delete request
-	.use(multer({
-		upload:null,//take uploading process 
-		onFileUploadStart:function(file){
-			//set upload with WritableStream
-				this.upload = gfs.createWriteStream({
+
+var dispatch = function(gfs) {
+	var stacks = [];
+	return multer({
+		onFileUploadStart:function(file){		 
+			stacks.push(gfs.createWriteStream({
 				filename:file.name,
 				mode:"w",
 				chunkSize:1024*4,
 				content_type:file.mimetype,
 				root:"fs",
 				metadata:{name:file.originalname}
-			})
+			}));
 		},
 		onFileUploadData:function(file,data) {
-			this.upload.write(data);//put the chucks into db 
+			stacks.forEach(function(stack) {
+				if(stack.name === file.name) stack.write(data);
+			})
 		},
 		onFileUploadComplete:function(file) {
-			//end process 
-			this.upload.end();
+			stacks.forEach(function(stack,index) {
+				if(stack.name === file.name) {
+					stack.end();
+					stacks.splice(index,1);
+				}
+			})//stack 
 		}
-	}))//middleware post and file request
+	})
+}//end dispatch files 
+
+
+
+app
+	.set('view engine', 'html')
+	.set('views', __dirname + '/app/views')
+	.use(cors())//middlewares acess among server's 
+	.use(require('morgan')('dev'))//middleware debug
+	.use(require('method-override')())//middleware put and delete request
+	.use(dispatch(gfs))//middleware post and file request
 	.use(express.static(__dirname+"/"))//statics resources
 	.use(express.static(__dirname+"/app"))//statics resources
 	.use(session({secret:key,exp:5}).unless({
@@ -91,11 +103,7 @@ app.route('/u/:name/post/:id').get(routes.onePost);//get single post by id
 //app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
 app.route('/u/:name/post').get(routes.allPost);//get all pot from user
 app.route('/u/new/post').post(routes.createPost);//create post
-
-
-
-
-
+//app.route('/upload').post(routes.upload_fs);
 
 /*
 ////////////////////////////
@@ -109,64 +117,6 @@ app.get('/statics/media/pictures/:name',function(req,res) {
 		gfs.createReadStream({filename:req.name}).pipe(res.type(file[0]['contentType']));
 	});
 });
-
-
-/*
-app.post('/fs/upload',multer({
-	upload:null,//take uploading process 
-	catch:[],
-	onFileUploadStart:function(file){
-		//set upload with WritableStream		
-		this.upload = gfs.createWriteStream({
-			filename:file.name,
-			mode:"w",
-			chunkSize:1024*4,
-			content_type:file.mimetype,
-			root:"fs",
-			metadata:{
-				name:file.originalname
-			}
-
-		});
-	},
-	onFileUploadData:function(file,data) {
-		var lose_data = this.catch;
-		var upload = this.upload;
-		//put the chucks into db 
-		if(!upload.write(data)) lose_data.push(data);
-
-	},
-	onFileUploadComplete:function(file) {
-		//end process 
-		var lose_data = this.catch;
-		var upload = this.upload;
-		upload.on('drain',function() {
-			console.log(lose_data);		
-			upload.end();
-		});
-	}
-
-}),function(req,res) {
-	res.send(req.files);
-});
-
-app.route('/fs/download/:file').get(function(req,res) {
-	var name = req.params.file;
-	gfs.files.find({filename:name}).toArray(function(err,file) {
-		if(err) return res.send(err);
-		var len = file[0]['length'];
-		var progress = 0;
-		gfs.createReadStream({filename:name})
-			.on('data',function(data) {
-				progress += data.length
-				console.log('PROGRESS',Math.ceil((progress/len)*100),'%');
-			})
-			.pipe(res.type('video/mp4'));
-	});
-
-
-});
-*/
 
 //web sockets
 io.on("connection",function(socket){

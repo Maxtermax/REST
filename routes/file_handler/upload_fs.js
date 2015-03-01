@@ -1,11 +1,5 @@
-var fs = require("fs");
+module.exports = function(req,res) {	
+   res.send(req.files);
 
-module.exports = function() {
+ }//end upload_fs 
 
-	var upload_fs = function(req,res) {	
-    res.send(req.files);
-  }//end upload_fs 
-
-
-	return upload_fs;
-};

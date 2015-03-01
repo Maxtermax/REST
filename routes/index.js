@@ -12,8 +12,7 @@ module.exports = function(auth,model,model_file) {
 		update 		: require(uPath+'update.js')(model.user),
 		delete 		: require(uPath+'delete.js')(model.user),
 		createPost: require(postPath+'createPost.js')(model["_"],model.user),
-		//updatePost: require(postPath+'updatePost.js')(model["_"],model.user),
-		upload_fs : require(fsPath+'upload_fs.js')(model_file),
+		upload_fs : require(fsPath+'upload_fs.js'),
 		get_fs    : require(fsPath+'get_fs.js')(model_file,model["_"])	
 	}	
 
