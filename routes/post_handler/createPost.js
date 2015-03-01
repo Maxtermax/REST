@@ -13,15 +13,17 @@ module.exports = function(_,model) {
 			body:b.body,
 			images:function() {
 				if(!files.file) return null;	
-				if(_.isArray(files.file)) return [{ url:_.pluck(files.file,'name')}];
-				return [{url:[files.file.name]}]
+				if(_.isArray(files.file)) {
+					return _.map(files.file,function(file) {	return {url:file.name} });
+				}
+				return [{url:files.file.name}]
 			}()
 		}
 		model.createPost(token,content,function(err,docs) {
 			if(err) return res.status(err.status).send(err);
 			res.status(docs.status).send(docs);
 		});			
-
+		
 	}
 };
 
