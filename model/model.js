@@ -5,7 +5,6 @@ var mongoose = require('mongoose')
 ,		id       = mongoose.mongo.ObjectID//call new for create instance
 ,		genHash = require('./resources/genHash.js')(bcrypt);
 
-
 mongoose.connect('mongodb://localhost/nuevo',function(err,res){
 	if(err) console.log(err,'ERROR');
 	else 		console.log("Conect at: nuevo");
@@ -57,17 +56,30 @@ var schema = new Schema({
 	}]
 });
 
+var model = mongoose.model('user',schema);
+
+var up = {
+	title:'titulo cambiado'
+}
+var data = _.object(_.map(up,function (val, key) {
+    return ["post.$."+key,val];
+}));
+
+var query = {"post._id":"54e8f8038c1b73301d08197b"};
+var update = {"$set": data }
+
+model.update(query,update,function(err,docs) {
+	if(err) return console.log(err,'err');
+	console.log(docs,'docs');
+});
+
+
+
+
+
+/*
+
 module.exports = function(key,jwt) {
-
-	schema.statics.logout = function(query,cb) {
-		var self = this;
-		self.model('user').findOneAndUpdate(query,{isLogin:false},function(err,docs) {
-			if(err) return cb(err);
-			if(!docs) return cb({sucess:false,message:'user not found'});
-			if(docs) return cb(null,docs);
-		})
-	};
-
 	schema.methods.getProfile = require('./resources/getProfile.js')(_,jwt,key);
 	schema.statics.onePost    = require('./resources/onePost.js')(_);
 	schema.statics.allPost    = require('./resources/allPost.js')(_);
@@ -84,10 +96,6 @@ module.exports = function(key,jwt) {
 		_:_
 	}
 
-};
-
-
-
-
-
+}
+*/
 

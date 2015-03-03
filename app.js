@@ -100,7 +100,7 @@ app.route('/u/delete/:id').delete(routes.delete);
 */
 
 app.route('/u/:name/post/:id').get(routes.onePost);//get single post by id
-//app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
+app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
 app.route('/u/:name/post').get(routes.allPost);//get all pot from user
 app.route('/u/new/post').post(routes.createPost);//create post
 

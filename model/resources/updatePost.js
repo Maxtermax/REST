@@ -1,11 +1,14 @@
-module.exports = function(_,jwt,key,ID) {
+module.exports = function(_) {
 	return function(user,id,body,cb) {
 		var self = this;
 		var model = self.model('user');
-		model.findAndUpdate(user,body,function(err,docs) {
-			if(err) return cb({status:500,err:err});
-			if(_isEmpty(docs)) return cb({status:404,message:'User not found'});
-			return cb(null,docs);
-		})
+		model.findOne({username:user},function(err,docs) {
+			if(err) return cb({sucess:false,status:500});
+			for(var i = 0;i<docs.length;i++) {
+				if(docs[i]['_id'] === id ) res.send(docs[i]); break;
+			}
+
+		});
+
 	}
 };
