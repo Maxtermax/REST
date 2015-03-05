@@ -1,8 +1,6 @@
-module.exports = function(_,genHash,jwt,key,bcrypt) {
+module.exports = function(_,genHash,jwt,key,bcrypt,model) {
 	return function(token,update,cb) {
 		var self  = this;
-		var model = self.model('user');
-
 		jwt.verify(token,key,function(err,decode) {
 			//get ID by token
 			if(err) return cb(err);

@@ -7,7 +7,7 @@ var express 		= require("express")//express 4
 ,		key  				= fs.readFileSync("secret/key.txt")
 ,		jwt 				= require("jsonwebtoken")
 ,		session			= require("express-jwt")
-,		model 			= require("./model/model.js")(key,jwt)
+,		model 			= require("./model/index.js")(key,jwt)
 ,		gfs				 	= require("./model/model_file.js")(model.mongo,fs,model._)
 ,		auth   			= require("./auth/auth.js")(key,jwt,model)
 ,		routes 			= require('./routes/index.js')(auth,model,gfs)
@@ -81,34 +81,37 @@ app.get('/',function(req,res) {
 	USER REGISTER
 /////////////////////////////
 */
-app.route('/signin').post(routes.signin);
-app.route('/login').post(routes.login);
+
+app.route('/signin').post(routes.user.signin);
+app.route('/login').post(routes.user.login);
+
 
 /*
 /////////////////////////////
 	USER SERVICES
 /////////////////////////////
 */
-app.route('/u/:name').get(routes.profile);
-app.route('/u/update').put(routes.update);
-app.route('/u/delete/:id').delete(routes.delete);
+app.route('/u/:name').get(routes.user.profile);
+app.route('/u/:name/update').put(routes.user.update);
+app.route('/u/delete/:id').delete(routes.user.delete);
+
+
 
 /*
 ////////////////////////////
 	POST SERVICES
 ////////////////////////////
-*/
 
 app.route('/u/:name/post/:id').get(routes.onePost);//get single post by id
 app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
 app.route('/u/:name/post').get(routes.allPost);//get all pot from user
 app.route('/u/new/post').post(routes.createPost);//create post
 
+*/
 /*
 ////////////////////////////
 	FILE SYSTEM
 ////////////////////////////
-*/
 
 app.get('/statics/media/pictures/:name',function(req,res) {
 	gfs.files.find({filename:req.name}).toArray(function(err,file) {
@@ -116,6 +119,7 @@ app.get('/statics/media/pictures/:name',function(req,res) {
 		gfs.createReadStream({filename:req.name}).pipe(res.type(file[0]['contentType']));
 	});
 });
+*/
 
 //web sockets
 io.on("connection",function(socket){

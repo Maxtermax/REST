@@ -6,9 +6,9 @@ module.exports = function(_,jwt,key) {
 		  		.exec(function(err,docs) {
 				 		console.log(query,'query');
 				 	  if(err)	return cb({err:err,message:'something wrong in the query'},null);
-				 		if(decode && docs && String(docs["_id"]) === decode["ID"]) return cb(null,_.omit(docs["_doc"],'password','_id','__v','isLogin'));	//complete view	
-				 		if(docs) return cb(null,_.pick(docs["_doc"],'email', 'username'));//limit view
+				 		if(decode && docs && String(docs["_id"]) === decode["ID"]) return cb(null,_.omit(docs["_doc"],'password','__v','isLogin'));	//complete view	
 				 		if(!docs)	return cb({status:404,success:false,message:'user no found'});				 					 			
+				 		return cb(null,_.pick(docs["_doc"],'email', 'username'));//limit view
 			 		})//end find with token	  			 
 	  })//end verify
 			 		
