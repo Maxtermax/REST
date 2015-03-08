@@ -1,14 +1,14 @@
-module.exports = function(_) {
-	return function(user,id,body,cb) {
-		var self = this;
-		var model = self.model('user');
-		model.findOne({username:user},function(err,docs) {
-			if(err) return cb({sucess:false,status:500});
-			for(var i = 0;i<docs.length;i++) {
-				if(docs[i]['_id'] === id ) res.send(docs[i]); break;
-			}
-
-		});
+module.exports = function(_,model) {
+	return function(query,body,cb) {
+		var data = _.object(_.map(body,function (val, key) {
+		    return ["post.$."+key,val];
+		}));
+		var query = {"post._id":query};
+		var update = {"$set": data };
+		model.update(query,update,function(err,docs) {
+			if(err) return cb({err:err,status:500,message:'Somethig was wrong :( try again'});
+			return cb(null,docs);
+		})
 
 	}
 };

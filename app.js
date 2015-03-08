@@ -95,23 +95,23 @@ app.route('/u/:name').get(routes.user.profile);
 app.route('/u/:name/update').put(routes.user.update);
 app.route('/u/delete/:id').delete(routes.user.delete);
 
-
-
 /*
 ////////////////////////////
 	POST SERVICES
 ////////////////////////////
-
-app.route('/u/:name/post/:id').get(routes.onePost);//get single post by id
-app.routes('u/:name/post/:id').put(routes.updatePost);//update single post
-app.route('/u/:name/post').get(routes.allPost);//get all pot from user
-app.route('/u/new/post').post(routes.createPost);//create post
-
 */
+
+app.route('/u/:name/post/all').get(routes.post.all);//get all pot from user
+app.route('/u/:name/post/new').post(routes.post.create);//create post
+app.route('/u/:name/post/:id').put(routes.post.update);//update single post
+app.route('/u/:name/post/:id').get(routes.post.one);//get single post by id
+
+
 /*
 ////////////////////////////
 	FILE SYSTEM
 ////////////////////////////
+*/
 
 app.get('/statics/media/pictures/:name',function(req,res) {
 	gfs.files.find({filename:req.name}).toArray(function(err,file) {
@@ -119,7 +119,6 @@ app.get('/statics/media/pictures/:name',function(req,res) {
 		gfs.createReadStream({filename:req.name}).pipe(res.type(file[0]['contentType']));
 	});
 });
-*/
 
 //web sockets
 io.on("connection",function(socket){

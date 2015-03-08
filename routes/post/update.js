@@ -1,10 +1,17 @@
-module.export = function(_,model) {
+module.exports = function(_,model) {
 	return function(req,res) {
-		var b = req.body;
-		model.updatePost(req.name,req.id,b,function(err,docs) {
+		var body = req.body;
+		var id = req.id;	
+		var post = model.post();
+		post.update(id,body,function(err,docs) {
 			if(err) return res.status(err.status).send(err);
-			res.send(docs)
-		})
+			if(docs) return res.send({
+				message:'Ok post updated',
+				status:200,
+				sucess:true,
+				post:body
+			});
+			res.send({message:'Somethig was wrong :( try again',status:500,sucess:false});
+		})		
 	}
-
-};
+}

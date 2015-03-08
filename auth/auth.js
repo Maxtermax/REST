@@ -9,7 +9,8 @@ var auth = function(key,jwt,model) {
 		var path = req.path;
 		if(path === '/upload') return next();
 
-		if(err) {
+		if(err) {	
+			if(path === '/u/alex/post/new') return next();
 			if(req.method === 'DELETE') {
 				return next();
 			}else if(req.method === 'GET') {

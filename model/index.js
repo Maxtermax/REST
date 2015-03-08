@@ -47,7 +47,7 @@ module.exports = function(key,jwt) {
 		return {
 			update:require('./resources/post/update.js')(_,model),
 			create:require('./resources/post/create.js')(_,jwt,key,id,model),
-			single:require('./resources/post/single.js')(_,model),
+			one:require('./resources/post/one.js')(_,model),
 			all:require('./resources/post/all.js')(_,model)
 		}
 	}

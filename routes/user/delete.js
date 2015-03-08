@@ -5,7 +5,6 @@ module.exports = function(model) {
 			if(err) return res.status(err.status).send(err);
 			res.send({status:200,message:"OK"});
 		})
-
 	}//end Delete
 
 }
