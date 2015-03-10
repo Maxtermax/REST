@@ -1,6 +1,7 @@
-module.exports = function(auth,model,model_file) {
+module.exports = function(auth,model,gfs) {
 	var _ = model["_"];
 	var model = model.user;
+
 	return {
 		user:{
 			login:require("./user/login.js")(auth,model,_),
@@ -9,14 +10,18 @@ module.exports = function(auth,model,model_file) {
 			delete:require("./user/delete.js")(model),
 			update:require("./user/update.js")(model)
 		},//user services
-		post: {
+		post:{
 			create:require("./post/create.js")(_,model),//POST
 			all:require("./post/all.js")(model),//GET
 			one:require("./post/one.js")(model),//GET
 			update:require("./post/update.js")(_,model)
-		}//post services
-	}	
-};
+		},//post services
+		files:{
+			get:require("./files/get.js")(gfs)
+		}
+	}//routes 	
+
+}
 
 
 

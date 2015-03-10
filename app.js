@@ -1,17 +1,16 @@
-var express 		= require("express")//express 4
-,		app 				= express()
-,		server 			= require("http").createServer(app)
-,		io 					= require("socket.io")(server)//socket last version
-,		fs 					= require("fs")
-,		cors 				= require("cors")
-,		key  				= fs.readFileSync("secret/key.txt")
-,		jwt 				= require("jsonwebtoken")
-,		session			= require("express-jwt")
-,		model 			= require("./model/index.js")(key,jwt)
-,		gfs				 	= require("./model/model_file.js")(model.mongo,fs,model._)
-,		auth   			= require("./auth/auth.js")(key,jwt,model)
-,		routes 			= require('./routes/index.js')(auth,model,gfs)
-,		multer 			= require('multer');
+var express = require("express")//express 4
+,		app = express()
+,		server = require("http").createServer(app)
+,		io = require("socket.io")(server)//socket last version
+,		fs = require("fs")
+,		cors = require("cors")
+,		key = fs.readFileSync("secret/key.txt")
+,		jwt = require("jsonwebtoken")
+,		session	= require("express-jwt")
+,		model = require("./model/index.js")(key,jwt)
+,		gfs	= require("./model/model_file.js")(model.mongo,fs,model._)
+,		auth = require("./auth/auth.js")(key,jwt,model)
+,		routes = require('./routes/index.js')(auth,model,gfs);
 
 	/*
 	/////////////////////////////
@@ -19,44 +18,13 @@ var express 		= require("express")//express 4
 	/////////////////////////////
 	*/
 
-var dispatch = function(gfs) {
-	var stacks = [];
-	return multer({
-		onFileUploadStart:function(file){		 
-			stacks.push(gfs.createWriteStream({
-				filename:file.name,
-				mode:"w",
-				chunkSize:1024*4,
-				content_type:file.mimetype,
-				root:"fs",
-				metadata:{name:file.originalname}
-			}));
-		},
-		onFileUploadData:function(file,data) {
-			stacks.forEach(function(stack) {
-				if(stack.name === file.name) stack.write(data);
-			})
-		},
-		onFileUploadComplete:function(file) {
-			stacks.forEach(function(stack,index) {
-				if(stack.name === file.name) {
-					stack.end();
-					stacks.splice(index,1);
-				}
-			})//stack 
-		}
-	})
-}//end dispatch files 
-
-
-
 app
 	.set('view engine', 'html')
 	.set('views', __dirname + '/app/views')
 	.use(cors())//middlewares acess among server's 
 	.use(require('morgan')('dev'))//middleware debug
 	.use(require('method-override')())//middleware put and delete request
-	.use(dispatch(gfs))//middleware post and file request
+	.use(require("./resources/file/save.js")(require("multer"))(gfs))//middleware post and file request
 	.use(express.static(__dirname+"/"))//statics resources
 	.use(express.static(__dirname+"/app"))//statics resources
 	.use(session({secret:key,exp:5}).unless({
@@ -112,13 +80,7 @@ app.route('/u/:name/post/:id').get(routes.post.one);//get single post by id
 	FILE SYSTEM
 ////////////////////////////
 */
-
-app.get('/statics/media/pictures/:name',function(req,res) {
-	gfs.files.find({filename:req.name}).toArray(function(err,file) {
-		if(err) return res.send(err);
-		gfs.createReadStream({filename:req.name}).pipe(res.type(file[0]['contentType']));
-	});
-});
+app.get('/statics/media/pictures/:name',routes.files.get);
 
 //web sockets
 io.on("connection",function(socket){

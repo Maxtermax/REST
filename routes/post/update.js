@@ -2,8 +2,10 @@ module.exports = function(_,model) {
 	return function(req,res) {
 		var body = req.body;
 		var id = req.id;	
+		var files = req.files;
+
 		var post = model.post();
-		post.update(id,body,function(err,docs) {
+		post.update(id,body,files,function(err,docs) {
 			if(err) return res.status(err.status).send(err);
 			if(docs) return res.send({
 				message:'Ok post updated',
@@ -11,7 +13,11 @@ module.exports = function(_,model) {
 				sucess:true,
 				post:body
 			});
-			res.send({message:'Somethig was wrong :( try again',status:500,sucess:false});
+			res.send({
+				message:'Somethig was wrong :( try again',
+				status:500,
+				sucess:false
+			});
 		})		
 	}
 }
